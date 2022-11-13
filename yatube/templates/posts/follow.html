@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+{% block title %} Последние посты избранных авторов {% endblock %}
+{% block content %}
+  <h1>Последние посты избранных авторов</h1>
+  {% include 'posts/includes/switcher.html' %}
+    {% load cache %}
+    {% cache 20 index_page with page_obj %}
+      {% for post in page_obj %}
+      {% include 'posts/includes/post_list.html' %}
+      {% if post.group %}
+        <br>
+        <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+      {% endif %}
+      </article>
+    {% if not forloop.last %}<hr>{% endif %}
+    {% endfor %}
+    {% endcache %} 
+  {% include 'posts/includes/paginator.html' %}
+{% endblock %}
