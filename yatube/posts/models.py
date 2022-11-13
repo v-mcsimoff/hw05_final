@@ -23,7 +23,10 @@ class Group(models.Model):
 
 
 class Post(CreatedModel):
-    text = models.TextField(verbose_name='Текст поста', help_text='Обязательное поле')
+    text = models.TextField(
+        verbose_name='Текст поста',
+        help_text='Обязательное поле'
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -57,7 +60,7 @@ class Post(CreatedModel):
 class Comment(CreatedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
                              related_name="comments", verbose_name='Пост',
-                             help_text='Пост, под которым оставлен комментарий')
+                             help_text='Комментируемый пост')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="comments",
                                verbose_name='Автор комментария',

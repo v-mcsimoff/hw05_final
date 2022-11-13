@@ -139,7 +139,7 @@ class PostPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk})
         )
-        post_image = Post.objects.first().image 
+        post_image = Post.objects.first().image
         self.assertEqual(post_image, 'posts/small.gif')
         for post in Post.objects.select_related('group'):
             self.assertEqual(response.context.get('post'), post)
@@ -177,7 +177,7 @@ class PostPagesTests(TestCase):
         form_data = {
             'text': 'тестовый комментарий',
             'author': self.post.author,
-            'post': self.post,    
+            'post': self.post,
         }
         self.authorized_client.post(reverse('posts:add_comment',
                                             args=[item_id.id]),
