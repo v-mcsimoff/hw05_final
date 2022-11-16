@@ -30,8 +30,8 @@ def index(request):
     return render(request, 'posts/index.html', context)
 
 
-# View-функция для страницы сообщества:
 def group_posts(request, slug=None):
+    """View-функция для страницы сообщества"""
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
     page_obj = pagination(request, posts)
@@ -48,12 +48,8 @@ def profile(request, username):
     posts = author.posts.all()
     count = posts.count()
     page_obj = pagination(request, posts)
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(
-            user=request.user, author=author
-        ).exists()
-    else:
-        following = False
+    following = request.user.is_authenticated and Follow.objects.filter(
+            user=request.user, author=author)
     context = {
         'page_obj': page_obj,
         'author': author,
@@ -131,7 +127,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    # список постов избранных авторов
+    """список постов избранных авторов"""
     queryset = Post.objects.filter(author__following__user=request.user)
     page_obj = pagination(request=request, queryset=queryset)
     context = {
@@ -142,20 +138,19 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    # Подписаться на автора
+    """Подписаться на автора"""
     user = request.user
     author = User.objects.get(username=username)
-    is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
-        Follow.objects.create(user=user, author=author)
+    user = request.user
+    if author != user:
+        Follow.objects.get_or_create(user=user, author=author)
     return redirect(reverse('posts:profile', args=[username]))
 
 
 @login_required
 def profile_unfollow(request, username):
-    # Дизлайк, отписка
+    """Дизлайк, отписка"""
     author = get_object_or_404(User, username=username)
     is_follower = Follow.objects.filter(user=request.user, author=author)
-    if is_follower.exists():
-        is_follower.delete()
+    is_follower.delete()
     return redirect('posts:profile', username=author)

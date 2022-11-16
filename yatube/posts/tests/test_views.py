@@ -171,30 +171,59 @@ class PostPagesTests(TestCase):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
 
+
+class CommentTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.post = Post.objects.create(
+            author=User.objects.create_user(username='author'),
+            text='Тестовый пост')
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.user = User.objects.create_user(username='author2')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
     def test_add_comment_authorized(self):
         """Зарегистрированный пользователь может добавлять комментарии"""
-        item_id = Post.objects.filter(author=self.user).first()
+        item = Post.objects.first()
         form_data = {
             'text': 'тестовый комментарий',
-            'author': self.post.author,
+            'author': self.user,
             'post': self.post,
         }
         self.authorized_client.post(reverse('posts:add_comment',
-                                            args=[item_id.id]),
+                                            args=[item.id]),
                                     data=form_data, follow=True)
         last_comment = (
-            Comment.objects.filter(author__username='author').last()
+            Comment.objects.filter(author__username='author2').last()
         )
         self.assertEqual(form_data['text'], last_comment.text)
-        self.assertEqual(item_id.id, last_comment.post.id)
-        self.assertEqual(str(last_comment.author), 'author')
+        self.assertEqual(item.id, last_comment.post.id)
+        self.assertEqual(str(last_comment.author), 'author2')
+
+
+class CacheTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.post = Post.objects.create(
+            author=User.objects.create_user(username='author'),
+            text='Тестовый пост')
+
+    def setUp(self):
+        self.guest_client = Client()
+        self.user = User.objects.create_user(username='author2')
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
 
     def test_cache_on_index_page(self):
         """Кэш на главной странице"""
         response = self.authorized_client.get(reverse('posts:index'))
         before_clearing_cache = response.content
         Post.objects.create(
-            group=PostPagesTests.group,
             text='текст после кэша',
             author=User.objects.get(username='author'))
         cache.clear()
@@ -241,8 +270,12 @@ class FollowTests(TestCase):
         Follow.objects.create(user=self.user_follower,
                               author=self.user_following)
         response = self.client_auth_follower.get('/follow/')
-        post_text = response.context["page_obj"][0].text
-        self.assertEqual(post_text, 'Тестовый пост для ленты')
+        post = response.context["page_obj"][0]
+        self.assertEqual(post.text, 'Тестовый пост для ленты')
+        self.assertTrue(
+            Follow.objects.filter(user=self.user_follower,
+                                  author=self.user_following).exists()
+        )
         response = self.client_auth_following.get('/follow/')
         self.assertNotContains(response,
                                'Тестовый пост для ленты')
