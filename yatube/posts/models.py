@@ -43,7 +43,7 @@ class Post(CreatedModel):
         help_text='Выберите группу или оставьте пустым',
     )
     image = models.ImageField(
-        'Картинка',
+        verbose_name='Картинка',
         upload_to='posts/',
         blank=True,
     )
