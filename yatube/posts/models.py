@@ -6,17 +6,17 @@ User = get_user_model()
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200, verbose_name='название группы')
-    description = models.TextField(verbose_name='описание')
+    title = models.CharField(max_length=200, verbose_name='group name')
+    description = models.TextField(verbose_name='description')
     slug = models.SlugField(
         max_length=50,
         unique=True,
-        verbose_name='Url адрес'
+        verbose_name='Url adress'
     )
 
     class Meta:
-        verbose_name = 'группа'
-        verbose_name_plural = 'группы'
+        verbose_name = 'group'
+        verbose_name_plural = 'groups'
 
     def __str__(self) -> str:
         return self.title
@@ -24,33 +24,33 @@ class Group(models.Model):
 
 class Post(CreatedModel):
     text = models.TextField(
-        verbose_name='Текст поста',
-        help_text='Обязательное поле'
+        verbose_name='Post text',
+        help_text='Required field'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='posts',
-        verbose_name='автор'
+        verbose_name='author'
     )
     group = models.ForeignKey(
         Group,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        verbose_name='Группа',
+        verbose_name='Group',
         related_name='posts',
-        help_text='Выберите группу или оставьте пустым',
+        help_text='Choose a group or leave blank',
     )
     image = models.ImageField(
-        verbose_name='Картинка',
+        verbose_name='Image',
         upload_to='posts/',
         blank=True,
     )
 
     class Meta:
-        verbose_name = 'пост'
-        verbose_name_plural = 'посты'
+        verbose_name = 'post'
+        verbose_name_plural = 'posts'
         ordering = ('-created',)
 
     def __str__(self):
@@ -59,17 +59,17 @@ class Post(CreatedModel):
 
 class Comment(CreatedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                             related_name="comments", verbose_name='Пост',
-                             help_text='Комментируемый пост')
+                             related_name="comments", verbose_name='Post',
+                             help_text='Commented post')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="comments",
-                               verbose_name='Автор комментария',
-                               help_text='Автор отображается на сайте')
-    text = models.TextField(verbose_name='Текст комментария',
-                            help_text='Обязательное поле')
+                               verbose_name='Comment author',
+                               help_text='The author is displayed on the website')
+    text = models.TextField(verbose_name='Comment text',
+                            help_text='Required field')
 
     class Meta:
-        verbose_name_plural = 'Комментарии к постам'
+        verbose_name_plural = 'Posts comments'
         ordering = ('-created',)
 
     def __str__(self):
