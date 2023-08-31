@@ -48,12 +48,12 @@ class FollowSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = get_object_or_404(User, username=data['following'].username)
         if user == self.context['request'].user:
-            raise serializers.ValidationError('Невозможно подписаться на себя')
+            raise serializers.ValidationError('You cannot subscribe to yourself')
 
         already_follow = Follow.objects.filter(
             user=self.context['request'].user, following=user
         ).exists()
 
         if already_follow:
-            raise serializers.ValidationError('Подписка уже активна')
+            raise serializers.ValidationError('You are already subscribed')
         return data
