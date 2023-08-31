@@ -15,16 +15,16 @@ class PostCreateFormTests(TestCase):
         super().setUpClass()
         settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Тестовое описание'
+            description='Test description'
         )
 
         cls.author = User.objects.create_user(username='author')
 
         cls.post = Post.objects.create(
             group=PostCreateFormTests.group,
-            text="Тестовый текст",
+            text="Test text",
             author=User.objects.get(username='author'),
         )
 
@@ -36,9 +36,9 @@ class PostCreateFormTests(TestCase):
         super().tearDownClass()
 
     def setUp(self):
-        # Создаем неавторизованный клиент
+        # Creating an unauthorized client
         self.guest_client = Client()
-        # Создаём авторизованный клиент
+        # Create an authorized client
         self.user = User.objects.create_user(username='WithoutName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
@@ -57,12 +57,12 @@ class PostCreateFormTests(TestCase):
         )
         self.form_data = {
             'group': self.group.pk,
-            'text': 'Пост с картинкой',
+            'text': 'Post with image',
             'image': self.uploaded,
         }
 
     def test_form_create(self):
-        """Проверка создания нового поста"""
+        """New post creation check"""
         post_count = Post.objects.count()
         response = self.authorized_client.post(reverse('posts:post_create'),
                                                data=self.form_data,
@@ -80,23 +80,23 @@ class PostCreateFormTests(TestCase):
         self.assertIsNotNone(new_post.image)
 
     def test_form_edit(self):
-        """Проверка редактирования поста"""
+        """Post edit check"""
         self.authorized_client = Client()
         self.authorized_client.force_login(self.author)
         form_data = {
             'group': self.group.id,
-            'text': 'Обновленный текст',
+            'text': 'Updated text',
         }
         self.authorized_client.post(
             reverse('posts:post_edit', args=[self.post.id]),
             data=form_data, follow=True)
 
         self.assertTrue(Post.objects.filter(
-            text='Обновленный текст',
+            text='Updated text',
             group=PostCreateFormTests.group).exists())
 
     def test_comment_form(self):
-        """Проверяем форму комментариев"""
-        form_data = {'text': 'тестовый комментарий'}
+        """Comment form check"""
+        form_data = {'text': 'test comment'}
         form = CommentForm(data=form_data)
         self.assertTrue(form.is_valid())
