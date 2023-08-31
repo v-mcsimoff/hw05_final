@@ -10,25 +10,25 @@ class PostURLTests(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='author')
         cls.group = Group.objects.create(
-            title='Тестовая группа',
+            title='Test group',
             slug='test_slug',
-            description='Тестовое описание',
+            description='Test description',
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text='Test post',
         )
 
     def setUp(self):
-        # Создаем неавторизованный клиент
+        # Creating an unauthorized client
         self.guest_client = Client()
-        # Создаем второй клиент
+        # Create a second client
         self.authorized_client = Client()
-        # Авторизуем пользователя
+        # Authorizing the user
         self.authorized_client.force_login(self.user)
 
     def test_pages_at_desired_location_for_all(self):
-        """Страницы доступны всем."""
+        """Pages are available to everyone."""
         url_names = (
             '/',
             '/group/test_slug/',
@@ -41,24 +41,23 @@ class PostURLTests(TestCase):
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_pages_at_desired_location_for_authorized(self):
-        """Страницы /create/ доступна авторизованному
-        пользователю."""
+        """The /create/ pages are available to an authorized
+        user."""
         response = self.authorized_client.get('/create/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_post_id_edit_url_at_desired_location_author(self):
-        """Страница posts/<post_id>/edit/ доступна автору."""
+        """The posts/<post_id>/edit/ page is accessible to the author."""
         response = self.authorized_client.get(f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_unexisting_url(self):
-        """Страница unexisting_page недоступна любому пользователю."""
+        """The unexisting_page is not available to any user."""
         response = self.guest_client.get('/<unexisting_page>/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_urls_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
-        # Шаблоны по адресам
+        """The URL uses an appropriate template."""
         templates_url_names = {
             'posts/index.html': '/',
             'posts/group_list.html': f'/group/{self.group.slug}/',
