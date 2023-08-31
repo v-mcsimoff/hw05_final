@@ -2,6 +2,8 @@
 
 Social network of bloggers. Allows users to write posts and publish them in different groups, subscribe to posts, add and delete posts and comment on them.
 Users also can subscribe to their favorite bloggers.
+The project can be checked at: http://mcsimov.pythonanywhere.com/
+The information could be also retrieved using API.
 
 ## Installation instructions
 ***- Clone the repository:***
@@ -39,6 +41,7 @@ python manage.py runserver
 ## Technologies:
 - Python 3.7
 - Django 2.2
+- REST API
 
 ## Author
 Vladimir Maksimov
