@@ -31,7 +31,7 @@ def index(request):
 
 
 def group_posts(request, slug=None):
-    """View-функция для страницы сообщества"""
+    """View function for a group page"""
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()
     page_obj = pagination(request, posts)
@@ -128,7 +128,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    """список постов избранных авторов"""
+    """List of posts by favorite authors."""
     queryset = Post.objects.filter(author__following__user=request.user)
     page_obj = pagination(request=request, queryset=queryset)
     context = {
@@ -139,7 +139,7 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    """Подписаться на автора"""
+    """Subscribe to author."""
     user = request.user
     author = User.objects.get(username=username)
     user = request.user
@@ -150,7 +150,7 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    """Дизлайк, отписка"""
+    """Unsubscribe."""
     author = get_object_or_404(User, username=username)
     is_follower = Follow.objects.filter(user=request.user, author=author)
     is_follower.delete()
