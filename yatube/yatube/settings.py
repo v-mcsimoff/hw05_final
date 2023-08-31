@@ -38,6 +38,7 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'api.apps.ApiConfig',
     'blogs.apps.BlogsConfig',
     'posts.apps.PostsConfig',
     'django.contrib.admin',
@@ -50,6 +51,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'about.apps.AboutConfig',
     'sorl.thumbnail',
+    'djoser',
     # 'debug_toolbar',
 ]
 
